@@ -1,0 +1,87 @@
+"use client";
+import ViewMessages from "@/components/custom/view-messages";
+import { useQuery } from "@tanstack/react-query";
+// import axios from "axios";
+import { useParams } from "next/navigation";
+
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useAuthInfo } from "@/components/custom/auth-query-provider";
+import ReplyBack from "@/components/custom/reply-back";
+import { Skeleton } from "@/components/ui/skeleton";
+import { client } from "@/lib/elysia-client";
+
+export default function Conversation() {
+  const { conversationId } = useParams<{ conversationId: string }>();
+  const authData = useAuthInfo();
+
+  const getMessagesByConvoId = async () => {
+    const response = await client.messages({conversationId}).get();
+    return response.data?.convoMessages;
+  };
+  const {
+    data: messages,
+    status,
+    error,
+  } = useQuery({
+    queryKey: ["get-messages", conversationId],
+    queryFn: getMessagesByConvoId,
+    staleTime: Infinity,
+    retry: 1,
+  });
+
+  if (status === "pending") return <MessageBoxSkeleton />;
+  if (status === "error") return <p>{error.message}</p>;
+
+  return (
+    <div className="flex h-screen min-h-screen items-center justify-center">
+      <Card className="relative mx-auto flex h-screen w-full min-w-[60%] flex-col rounded-none bg-black text-white md:h-9/10 md:max-w-40">
+        <CardHeader className="bg-black text-white">
+          <CardTitle>{authData?.data?.user.name}</CardTitle>
+          <CardDescription>{`@${authData?.data?.user.username}`}</CardDescription>
+          <CardAction></CardAction>
+        </CardHeader>
+        <CardContent className="h-full max-h-10/12 flex-1 overflow-hidden px-2 pb-30">
+          <ViewMessages
+            convoMessages={messages!}
+            conversationId={conversationId}
+          />
+        </CardContent>
+        <CardFooter className="absolute right-0 bottom-10 left-0 h-30 rounded-none border-t-0 bg-black">
+          <ReplyBack conversationId={conversationId} />
+        </CardFooter>
+      </Card>
+    </div>
+  );
+}
+
+export function MessageBoxSkeleton() {
+  return (
+    <div className="flex h-screen min-h-screen items-center justify-center">
+      <Card className="relative mx-auto flex h-screen w-full min-w-[60%] flex-col rounded-none bg-gray-300 text-white md:h-9/10 md:max-w-40">
+        <CardHeader className="bg-gray-300 text-white">
+          <CardTitle>
+            <Skeleton className="h-7 w-30" />
+          </CardTitle>
+          <CardDescription>
+            <Skeleton className="h-5 w-40" />
+          </CardDescription>
+          <CardAction></CardAction>
+        </CardHeader>
+        <CardContent className="h-full max-h-10/12 flex-1 overflow-hidden px-2 pb-30">
+          <Skeleton className="h-full w-full" />
+        </CardContent>
+        <CardFooter className="absolute right-0 bottom-10 left-0 h-30 rounded-none border-t-0 bg-gray-300">
+          <Skeleton className="h-20 w-full" />
+        </CardFooter>
+      </Card>
+    </div>
+  );
+}
