@@ -39,6 +39,7 @@ export default function ReplyBack({
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
+      inputRef.current?.focus();
       await client["reply-message"].post({
         conversationId: conversationId,
         messageContent: data.messageContent,
@@ -51,6 +52,7 @@ export default function ReplyBack({
       console.log(error);
       toast.error("Error sending message");
     } finally {
+      inputRef.current?.focus();
       form.reset();
       inputRef.current?.focus();
     }
