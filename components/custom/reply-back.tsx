@@ -1,3 +1,4 @@
+"use client";
 import { Controller } from "react-hook-form";
 import { Field, FieldDescription, FieldError } from "../ui/field";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +14,7 @@ import {
 import * as z from "zod";
 import { toast } from "sonner";
 import { client } from "@/lib/elysia-client";
+import { useRef } from "react";
 
 const formSchema = z.object({
   messageContent: z
@@ -26,6 +28,7 @@ export default function ReplyBack({
 }: {
   conversationId: string;
 }) {
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,6 +52,7 @@ export default function ReplyBack({
       toast.error("Error sending message");
     } finally {
       form.reset();
+      inputRef.current?.focus();
     }
   }
 
@@ -68,6 +72,7 @@ export default function ReplyBack({
                   aria-invalid={fieldState.invalid}
                   placeholder="Type a message..."
                   rows={1}
+                  ref={inputRef}
                 />
                 <button
                   type="submit"
