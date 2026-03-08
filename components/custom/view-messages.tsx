@@ -20,12 +20,18 @@ export default function ViewMessages({
 }: ViewMessagesProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // keep messages in chronological order (oldest first)
+  const sortedMessages = [...convoMessages].sort((a, b) =>
+    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  );
+
   useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop =
-        scrollContainerRef.current.scrollHeight;
+    const el = scrollContainerRef.current;
+    if (el) {
+      // `scrollHeight` sometimes includes padding; using scrollTo is more reliable
+      el.scrollTo({ top: el.scrollHeight, behavior: "auto" });
     }
-  }, [convoMessages]);
+  }, [sortedMessages]);
 
   return (
     <div
@@ -37,7 +43,7 @@ export default function ViewMessages({
           Someone just started an anonymous conversation
         </p>
       </div>
-      {convoMessages.map((convoMessage) => (
+      {sortedMessages.map((convoMessage) => (
         <MessagePill
           key={convoMessage?.createdAt.toDateString()}
           classname="border-amber-400"

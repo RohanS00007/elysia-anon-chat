@@ -54,7 +54,9 @@ export const getMessages = new Elysia().use(betterAuth).get(
           createdAt: message.createdAt,
         })
         .from(message)
-        .where(eq(message.conversationId, conversationId));
+        .where(eq(message.conversationId, conversationId))
+        // always return oldest messages first so chat flows bottom-up
+        .orderBy(message.createdAt);
 
       if (fetchedMessages.length === 0) {
         return status(404, {
