@@ -2,9 +2,10 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "bun run next dev",
-    "build": "bun run next build",
+    "dev": "bun run --bun next dev",
+    "build": "bun run --bun next build",
     "start": "bun run --bun next start",
     "lint": "eslint",
     "auth:generate": "bun x auth@latest generate",
