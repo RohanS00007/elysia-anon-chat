@@ -4,6 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { Skeleton } from "../ui/skeleton";
 import { client } from "@/lib/elysia-client";
+import { Trash2Icon } from "lucide-react";
+import { Button } from "../ui/button";
+import { useQueryClient } from "@tanstack/react-query";
 
 const fetchConversations = async () => {
   const { data: conversationList } = await client.conversations.get();
@@ -11,6 +14,7 @@ const fetchConversations = async () => {
 };
 
 export default function ConversationTile() {
+  const queryClient = useQueryClient();
   const { data, status } = useQuery({
     queryKey: ["get-convo"],
     queryFn: fetchConversations,
@@ -18,6 +22,12 @@ export default function ConversationTile() {
     retry: false,
   });
 
+  const deleteConvo = async (convoId: string) => {
+    await client.deleteconvo({ conversationId: convoId }).post();
+    queryClient.invalidateQueries({
+      queryKey: ["get-convo"],
+    });
+  };
   if (status === "pending") return <ConversationTileSkeleton />;
 
   if (status === "error")
@@ -37,6 +47,9 @@ export default function ConversationTile() {
                 <p>{`Conversation ${counter++}`}</p>
               </div>
             </Link>
+            {/* <Button className={} onClick={() => deleteConvo(convo.id)}>
+              <Trash2Icon size={5} />
+            </Button> */}
           </li>
         ))}
       </ul>

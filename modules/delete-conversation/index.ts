@@ -6,8 +6,8 @@ import Elysia from "elysia";
 import * as z from "zod";
 import { DeleteConvoModels } from "./model";
 
-export const deleteConvoController = new Elysia().use(betterAuth).delete(
-  "/delete/:conversationId",
+export const deleteConvoController = new Elysia().use(betterAuth).post(
+  "/deleteconvo/:conversationId",
   async ({ params: { conversationId }, user, status }) => {
     try {
       const userId = user.id;

@@ -27,6 +27,7 @@ export const getConversation = new Elysia().use(betterAuth).get(
           eq(conversation.senderId, userId),
         ),
       );
+
     
     if(activeConversation.length === 0){
         return status(404, {
